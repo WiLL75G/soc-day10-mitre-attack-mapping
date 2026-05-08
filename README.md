@@ -4,11 +4,11 @@
 
 ## Incident Summary
 
-- **Incident Type:** Threat-Informed Defense — Detection Coverage Assessment & Gap Analysis
+- **Incident Type:** Threat Informed Defense Detection Coverage Assessment & Gap Analysis
 - **Severity:** High (5 Critical Coverage Gaps Identified)
 - **Detection Method:** MITRE ATT&CK Framework Mapping + SOC Detection Inventory + Navigator Visualization
 - **Tools Used:** MITRE ATT&CK Navigator, Splunk Enterprise, ATT&CK Framework v14
-- **Status:** Assessment Complete — Remediation Roadmap Delivered
+- **Status:** Assessment Complete Remediation Roadmap Delivered
 
 ---
 
@@ -50,7 +50,7 @@ The output of this assessment is a Navigator-based coverage map and a prioritize
 
 ---
 
-### 2. Current Detection Mapping — Initial View
+### 2. Current Detection Mapping Initial View
 
 ![Current Detections 1](./screenshots/02_current_detections_1.png)
 
@@ -66,7 +66,7 @@ The output of this assessment is a Navigator-based coverage map and a prioritize
 
 ---
 
-### 3. Current Detection Mapping — Extended View
+### 3. Current Detection Mapping Extended View
 
 ![Current Detections 2](./screenshots/02_current_detections_2.png)
 
@@ -94,7 +94,7 @@ The output of this assessment is a Navigator-based coverage map and a prioritize
 
 - Gap distribution across multiple tactics indicates strategic blind spots
 - High prevalence techniques (PowerShell, Phishing) warrant priority remediation
-- Visual gap mapping supports executive-level reporting
+- Visual gap mapping supports executive level reporting
 
 ---
 
