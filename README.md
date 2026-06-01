@@ -1,4 +1,4 @@
-# Day 10 – SOC Tier 1 Incident Report: MITRE ATT&CK Detection Coverage Assessment
+# MITRE ATT&CK Detection Coverage Assessment (SOC Tier 1)
 
 ---
 
