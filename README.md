@@ -1,219 +1,146 @@
-# MITRE ATT&CK Detection Coverage Assessment (SOC Tier 1)
+# MITRE ATT&CK Detection Coverage Assessment
 
----
+Mapping the detections in a home SOC lab against the ATT&CK matrix to answer one question honestly: what would get through. Four techniques covered, five gaps found, roadmap written.
 
-## Incident Summary
+## At a Glance
 
-- **Incident Type:** Threat Informed Defense Detection Coverage Assessment & Gap Analysis
-- **Severity:** High (5 Critical Coverage Gaps Identified)
-- **Detection Method:** MITRE ATT&CK Framework Mapping + SOC Detection Inventory + Navigator Visualization
-- **Tools Used:** MITRE ATT&CK Navigator, Splunk Enterprise, ATT&CK Framework v14
-- **Status:** Assessment Complete Remediation Roadmap Delivered
+| Field | Detail |
+| --- | --- |
+| Assessment Type | Detection coverage and gap analysis |
+| Framework | MITRE ATT&CK Enterprise Matrix v14 |
+| Detection Stack | Splunk Enterprise and Universal Forwarder |
+| Tools Used | MITRE ATT&CK Navigator, Splunk |
+| Scope | 9 techniques assessed against the lab environment |
+| Outcome | 4 detected, 5 gaps, remediation roadmap delivered |
 
----
+## What This Is
 
-## Executive Summary
+Every SOC believes it has coverage until someone asks what it would miss.
 
-A structured MITRE ATT&CK detection coverage assessment was performed on a home SOC lab environment. Four techniques were confirmed detected via Splunk alert rules built in Day 08, and five critical detection gaps were identified requiring immediate detection engineering work.
+This assessment takes the Splunk alert rules built in the previous lab and maps them onto the ATT&CK matrix, then marks what is not there. The value is not the green squares. It is the red ones.
 
-The output of this assessment is a Navigator-based coverage map and a prioritized remediation roadmap to guide future detection coverage improvements across the SOC.
+Scope stated plainly: this is a home lab, and 9 techniques is a deliberately narrow assessment scope, not the full Enterprise matrix. The 44 percent figure describes coverage within that scope only. Reporting it as an overall SOC coverage score would be a lie made of arithmetic.
 
----
-
-## Affected System
-
-- **Environment:** Home SOC Lab
-- **Detection Stack:** Splunk Enterprise + Universal Forwarder (carried forward from Day 08)
-- **Framework Reference:** MITRE ATT&CK Enterprise Matrix v14
-- **Visualization Tool:** MITRE ATT&CK Navigator
-- **Assessment Output:** Navigator JSON layer (`layer_detection_coverage.json`)
-
----
-
-## Investigation Methodology
-
----
-
-### 1. ATT&CK Navigator Baseline
+## Navigator Baseline
 
 ![Blank Layer](./screenshots/01_blank_layer.png)
 
-- Initialized a blank ATT&CK Navigator layer as the assessment baseline
-- Established the canvas for mapping current and missing detections
-- Confirmed Enterprise Matrix scope before applying coverage marking
+A blank Navigator layer was initialised as the starting canvas, with Enterprise Matrix scope confirmed before any marking.
 
-### SOC Observations:
+Starting blank matters. Start from the detections you already have and you map what you built. Start from the matrix and you map what an attacker can do, which is a different question with a much less comfortable answer.
 
-- A blank Navigator layer is the standard starting point for coverage assessments
-- The framework must be reviewed before any detection mapping begins
-- Baseline visualization prevents bias toward already known detections
-
----
-
-### 2. Current Detection Mapping Initial View
+## Mapping Current Detections
 
 ![Current Detections 1](./screenshots/02_current_detections_1.png)
 
-- Marked 4 techniques as actively detected in the SOC environment
-- Mapped each detection back to its source Splunk alert rule from Day 08
-- Color coded detected techniques in green for visual confirmation
-
-### SOC Observations:
-
-- Detection inventory must reflect operational reality, not aspirational rules
-- Each detected technique must be tied to a specific, active alert rule
-- Visual confirmation surfaces coverage strengths immediately
-
----
-
-### 3. Current Detection Mapping Extended View
-
 ![Current Detections 2](./screenshots/02_current_detections_2.png)
 
-- Validated full detection coverage view across the matrix
-- Confirmed all four detected techniques rendered correctly in Navigator
-- Verified detection mapping aligned with active Splunk SPL rules
+Four techniques were marked as actively detected, each tied back to a specific Splunk alert rule from the previous build.
 
-### SOC Observations:
+The rule for this step is that a technique only gets marked green if a named, running alert covers it. Not a rule that is planned. Not a rule that could be written. A coverage map built on intentions is worse than no map, because it produces confidence without capability.
 
-- Multi view validation reduces visualization errors before reporting
-- Cross matrix confirmation ensures detections are accurately reflected
-- Layer integrity is critical for downstream coverage analysis
-
----
-
-### 4. Coverage Gap Visualization
+## Gap Visualisation
 
 ![Gap Map 1](./screenshots/03_coverage_gap_map_1.png)
 
-- Marked 5 critical detection gaps in red across the matrix
-- Cross referenced gaps against high prevalence adversary TTPs
-- Confirmed gaps span multiple tactics Execution, Initial Access, Impact, Exfiltration
+Five gaps were marked in red, cross referenced against high prevalence adversary techniques.
 
-### SOC Observations:
+The distribution is the finding. The gaps are not scattered randomly, they cluster in Execution, Initial Access, Impact, and Exfiltration, which means these are not missing rules. They are missing tactics.
 
-- Gap distribution across multiple tactics indicates strategic blind spots
-- High prevalence techniques (PowerShell, Phishing) warrant priority remediation
-- Visual gap mapping supports executive level reporting
-
----
-
-### 5. Final Coverage Map
+## Final Coverage Map
 
 ![Gap Map 2](./screenshots/03_coverage_gap_map_2.png)
 
-- Finalized the unified coverage map showing both detections and gaps
-- Exported Navigator layer JSON for archival and version control
-- Validated coverage map against Splunk alert inventory
+The unified map was finalised showing detections and gaps together, and the layer exported to JSON for version control.
 
-### SOC Observations:
+Exporting the layer is what makes this repeatable. A coverage map is a snapshot, and a snapshot only has meaning next to the one before it. Versioned layers turn a one time assessment into a measurable trend.
 
-- Combined visualization is the primary deliverable for SOC leadership
-- Layer JSON enables versioned tracking of coverage over time
-- Re-assessment cadence (e.g. quarterly) is industry standard practice
+## Detection Coverage
 
----
-
-## Detection Coverage Map
-
-| Technique ID | Technique Name                       | Tactic                | Status      |
-|--------------|--------------------------------------|-----------------------|-------------|
-| T1110        | Brute Force                          | Credential Access     | ✅ Detected |
-| T1078        | Valid Accounts                       | Initial Access        | ✅ Detected |
-| T1548        | Abuse Elevation Control Mechanism    | Privilege Escalation  | ✅ Detected |
-| T1053.003    | Scheduled Task/Job: Cron             | Persistence           | ✅ Detected |
-| T1566        | Phishing                             | Initial Access        | ❌ Gap      |
-| T1059.001    | PowerShell                           | Execution             | ❌ Gap      |
-| T1486        | Data Encrypted for Impact            | Impact                | ❌ Gap      |
-| T1567        | Exfiltration Over Web Service        | Exfiltration          | ❌ Gap      |
-| T1059        | Command and Scripting Interpreter    | Execution             | ❌ Gap      |
-
----
-
-## Gap Remediation Roadmap
-
-| Gap                  | Technique ID | Recommended Detection                           |
-|----------------------|--------------|-------------------------------------------------|
-| Phishing             | T1566        | Email gateway alerts + attachment scanning      |
-| PowerShell           | T1059.001    | PowerShell Script Block Logging in Splunk       |
-| Ransomware           | T1486        | File integrity monitoring alerts                |
-| Exfiltration         | T1567        | Outbound traffic anomaly detection              |
-| Script Interpreter   | T1059        | Process creation logging + SPL detection rules  |
-
----
+| Technique ID | Technique | Tactic | Status |
+| --- | --- | --- | --- |
+| T1110 | Brute force | Credential Access | Detected |
+| T1078 | Valid accounts | Initial Access | Detected |
+| T1548 | Abuse elevation control mechanism | Privilege Escalation | Detected |
+| T1053.003 | Scheduled task or job, cron | Persistence | Detected |
+| T1566 | Phishing | Initial Access | Gap |
+| T1059.001 | PowerShell | Execution | Gap |
+| T1059 | Command and scripting interpreter | Execution | Gap |
+| T1486 | Data encrypted for impact | Impact | Gap |
+| T1567 | Exfiltration over web service | Exfiltration | Gap |
 
 ## Coverage Metrics
 
-| Metric                        | Value                            |
-|-------------------------------|----------------------------------|
-| Total Techniques Assessed     | 9                                |
-| Techniques Detected           | 4                                |
-| Detection Coverage Score      | 44%                              |
-| Critical Gaps Identified      | 5                                |
-| Source of Active Detections   | Splunk Enterprise (Day 08 build) |
-| Layer Artifact                | `layer_detection_coverage.json`  |
+| Metric | Value |
+| --- | --- |
+| Techniques assessed | 9 |
+| Techniques detected | 4 |
+| Coverage within assessed scope | 44 percent |
+| Gaps identified | 5 |
+| Detection source | Splunk Enterprise, forwarder based build |
+| Layer artefact | layer_detection_coverage.json |
 
----
+## What the Gaps Actually Mean
 
-## MITRE ATT&CK Mapping
+Read the map as an attacker and the problem is obvious.
 
-| Tactic                | Technique                          | ID         | Coverage |
-|-----------------------|------------------------------------|------------|----------|
-| Credential Access     | Brute Force                        | T1110      | ✅       |
-| Initial Access        | Valid Accounts                     | T1078      | ✅       |
-| Privilege Escalation  | Abuse Elevation Control Mechanism  | T1548      | ✅       |
-| Persistence           | Scheduled Task/Job: Cron           | T1053.003  | ✅       |
-| Initial Access        | Phishing                           | T1566      | ❌       |
-| Execution             | PowerShell                         | T1059.001  | ❌       |
-| Impact                | Data Encrypted for Impact          | T1486      | ❌       |
-| Exfiltration          | Exfiltration Over Web Service      | T1567      | ❌       |
-| Execution             | Command and Scripting Interpreter  | T1059      | ❌       |
+Coverage sits entirely in authentication and persistence. Getting in is watched. Escalating is watched. Staying is watched.
 
----
+Nothing watches execution, and nothing watches data leaving.
 
-## SOC Analyst Findings
+That shape means an attacker who arrives with valid credentials, which is the most common way anyone arrives, can run whatever they like through PowerShell and walk data out over a web service without generating a single alert. The lab would record them logging in and then go quiet for the entire rest of the intrusion.
 
-- Four techniques confirmed detected through active Splunk alert rules
-- Five critical detection gaps identified across Execution, Initial Access, Impact, and Exfiltration
-- Coverage concentrated in authentication and persistence not impact or exfiltration
-- PowerShell execution monitoring absent despite high attacker prevalence
-- No detection capability for ransomware behaviour (T1486) or web based exfiltration (T1567)
-- Existing Splunk alerts deliver strong coverage for credential and CRON-based activity
+Coverage concentrated at the front of the kill chain feels like security and is not. The gaps are at the end, which is where the damage happens.
 
----
+## Remediation Roadmap
 
-## SOC Analyst Response
+| Priority | Gap | Technique | Detection to Build |
+| --- | --- | --- | --- |
+| 1 | PowerShell execution | T1059.001 | Script Block Logging into Splunk, Event ID 4104 |
+| 2 | Script interpreters | T1059 | Process creation logging with SPL rules |
+| 3 | Web based exfiltration | T1567 | Outbound traffic anomaly detection |
+| 4 | Ransomware behaviour | T1486 | File integrity monitoring alerts |
+| 5 | Phishing | T1566 | Email gateway alerting and attachment scanning |
 
-- Prioritize PowerShell Script Block Logging deployment to close T1059.001 gap
-- Implement file integrity monitoring to gain detection capability against ransomware (T1486)
-- Deploy outbound traffic anomaly detection to close exfiltration blind spot (T1567)
-- Enable email gateway alerting and attachment scanning to detect phishing (T1566)
-- Integrate process creation telemetry into Splunk to cover scripting interpreters (T1059)
-- Maintain ATT&CK Navigator layer in version control for coverage tracking
-- Re-assess detection coverage quarterly to measure improvement velocity
+Execution is first because it is the widest gap and the cheapest to close. Script Block Logging is a policy change, not a purchase, and it turns the darkest part of the map green faster than anything else on the list.
 
----
+## Analyst Findings
 
-## Analyst Insight
+Four techniques confirmed detected by named, active Splunk rules.
 
-A 44% detection rate across the assessed scope is consistent with a small SOC environment building out coverage from foundational authentication monitoring. The most consequential findings are the absence of execution layer detection (PowerShell, scripting interpreters) and the complete lack of impact and exfiltration coverage. An attacker progressing through the kill chain could establish presence undetected through scripting and remove data without triggering a single alert. Closing execution and exfiltration gaps must precede further detection engineering work.
+Five gaps identified spanning Execution, Initial Access, Impact, and Exfiltration.
 
----
+Coverage concentrated in authentication and persistence, absent in execution and exfiltration.
 
-## Learning Outcome
+PowerShell monitoring absent despite being among the most used techniques in real intrusions.
 
-This investigation demonstrates the ability to:
+No capability against ransomware behaviour or web based data exfiltration.
 
-- Apply the MITRE ATT&CK Framework to real SOC environments
-- Build a Navigator-based detection coverage map
-- Calculate quantitative detection coverage scores
-- Identify and prioritize detection gaps using threat informed defense principles
-- Translate Splunk alert rules into ATT&CK technique coverage
-- Produce executive level remediation roadmaps for SOC leadership
-- Export and version control ATT&CK Navigator layer artifacts
-- Connect offensive technique knowledge with defensive detection capability
+## Recommended Response
 
----
+Close the execution gap before building anything else, because execution is the step every intrusion passes through.
+
+Deploy PowerShell Script Block Logging and route Event ID 4104 into Splunk.
+
+Add process creation telemetry to cover the wider scripting interpreter case.
+
+Build outbound anomaly detection so data leaving is a detectable event.
+
+Keep the Navigator layer in version control and re assess quarterly to measure whether coverage is moving.
+
+## What This Lab Demonstrates
+
+Auditing your own detections against an adversary framework rather than assuming coverage.
+
+Refusing to mark a technique detected without a named, running rule behind it.
+
+Reading a coverage map as a kill chain and identifying where an intrusion goes dark.
+
+Prioritising remediation by attacker prevalence and cost to implement, not by matrix order.
+
+Producing a versioned Navigator artefact that turns coverage into a trackable metric.
+
+Reporting a coverage percentage with its scope attached instead of inflating it.
 
 ## Repository Structure
 
@@ -232,6 +159,5 @@ mitre-attack-detection-coverage-lab/
 
 ---
 
-## Conclusion
-
-This assessment delivered a structured MITRE ATT&CK detection coverage map for a home SOC lab. Four detections were confirmed active via Splunk, five critical gaps were identified, and a prioritized remediation roadmap was produced. The project demonstrates the ability to think offensively and defensively mapping real attacker techniques against current SOC capability and translating gaps into actionable detection engineering work.
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-WilliamInCyber-blue?style=flat&logo=linkedin)](https://linkedin.com/in/WilliamInCyber)
+[![X](https://img.shields.io/badge/X-WilliamInCyber-black?style=flat&logo=x)](https://x.com/WilliamInCyber)
