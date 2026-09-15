@@ -1,155 +1,318 @@
 # MITRE ATT&CK Detection Coverage Assessment
 
-Mapping the detections in a home SOC lab against the ATT&CK matrix to answer one question honestly: what would get through. Four techniques covered, five gaps found, roadmap written.
+I mapped detection and monitoring coverage in my home SOC lab against a deliberately narrow MITRE ATT&CK scope to identify what the lab could see, what still needed stronger detection logic, and where visibility was missing.
+
+![MITRE ATT&CK Coverage Assessment Flow](./screenshots/00_architecture.png)
+
+**Navigator Baseline → Map Coverage → Validate Evidence → Prioritise Gaps**
+
+This project is a detection coverage assessment, not a claim of coverage across the full ATT&CK Enterprise Matrix.
 
 ## At a Glance
 
 | Field | Detail |
 | --- | --- |
 | Assessment Type | Detection coverage and gap analysis |
-| Framework | MITRE ATT&CK Enterprise Matrix v14 |
+| Framework | MITRE ATT&CK Enterprise Matrix v14 at the time of the original assessment |
 | Detection Stack | Splunk Enterprise and Universal Forwarder |
 | Tools Used | MITRE ATT&CK Navigator, Splunk |
-| Scope | 9 techniques assessed against the lab environment |
-| Outcome | 4 detected, 5 gaps, remediation roadmap delivered |
+| Scope | 8 techniques reviewed against the lab environment |
+| Validation | Existing Splunk rules and available telemetry reviewed against ATT&CK |
+| Type | Detection coverage assessment |
 
-## What This Is
+## What I Built
 
-Every SOC believes it has coverage until someone asks what it would miss.
+I used MITRE ATT&CK Navigator to review where my existing Splunk monitoring aligned with adversary techniques and where meaningful gaps remained.
 
-This assessment takes the Splunk alert rules built in the previous lab and maps them onto the ATT&CK matrix, then marks what is not there. The value is not the green squares. It is the red ones.
+The original assessment was performed against ATT&CK Enterprise Matrix v14.
 
-Scope stated plainly: this is a home lab, and 9 techniques is a deliberately narrow assessment scope, not the full Enterprise matrix. The 44 percent figure describes coverage within that scope only. Reporting it as an overall SOC coverage score would be a lie made of arithmetic.
+ATT&CK has changed since the project was originally completed, so this repository preserves the historical assessment rather than presenting v14 as the current ATT&CK release.
+
+The goal was not to make the largest possible number of ATT&CK cells green.
+
+The goal was to ask a harder question:
+
+**What does the evidence actually justify calling coverage?**
+
+That distinction became important because having telemetry for an activity is not automatically the same as having a reliable detection for malicious use of that activity.
+
+## Assessment Flow
+
+The assessment followed four stages.
+
+| Stage | Purpose |
+| --- | --- |
+| Navigator Baseline | Start from the ATT&CK matrix rather than only the detections already built |
+| Map Coverage | Identify techniques with relevant Splunk rules or telemetry |
+| Validate Evidence | Determine what level of coverage the available evidence actually supports |
+| Prioritise Gaps | Identify missing visibility and create a remediation roadmap |
+
+Starting from the matrix helped prevent the assessment from becoming a list of things I had already built.
+
+The useful part of a coverage assessment is not only identifying what can be seen.
+
+It is identifying where visibility becomes weak or disappears.
 
 ## Navigator Baseline
 
-![Blank Layer](./screenshots/01_blank_layer.png)
+![Blank ATT&CK Navigator Layer](./screenshots/01_blank_layer.png)
 
-A blank Navigator layer was initialised as the starting canvas, with Enterprise Matrix scope confirmed before any marking.
+I started with an ATT&CK Navigator layer before marking the techniques included in the assessment.
 
-Starting blank matters. Start from the detections you already have and you map what you built. Start from the matrix and you map what an attacker can do, which is a different question with a much less comfortable answer.
+The assessment intentionally covered a small subset of ATT&CK.
 
-## Mapping Current Detections
+It should therefore be read as a review of the selected lab scope, not as an overall SOC coverage score.
 
-![Current Detections 1](./screenshots/02_current_detections_1.png)
+## Mapping Existing Coverage
 
-![Current Detections 2](./screenshots/02_current_detections_2.png)
+![Current Coverage Mapping 1](./screenshots/02_current_detections_1.png)
 
-Four techniques were marked as actively detected, each tied back to a specific Splunk alert rule from the previous build.
+![Current Coverage Mapping 2](./screenshots/02_current_detections_2.png)
 
-The rule for this step is that a technique only gets marked green if a named, running alert covers it. Not a rule that is planned. Not a rule that could be written. A coverage map built on intentions is worse than no map, because it produces confidence without capability.
+The original Navigator assessment marked four areas green based on the Splunk monitoring available in the lab:
+
+* Brute Force
+* Valid Accounts
+* Abuse Elevation Control Mechanism
+* Scheduled Task or Job
+
+Reviewing the project later exposed an important distinction.
+
+A green Navigator cell can show that relevant telemetry or monitoring exists, but that does not automatically prove reliable behavioral detection for the entire ATT&CK technique.
+
+For that reason, the final portfolio assessment separates **stronger detection evidence** from **telemetry or monitoring coverage**.
+
+## Coverage Validation
+
+### T1110, Brute Force
+
+**Coverage classification: Detection coverage**
+
+The lab contains authentication monitoring designed around repeated failed authentication activity.
+
+This directly aligns with the behavior represented by T1110.
+
+### T1078, Valid Accounts
+
+**Coverage classification: Telemetry or monitoring coverage**
+
+Successful authentication activity can be present in the available logs, but successful authentication alone does not identify malicious use of a valid account.
+
+The lab therefore has useful authentication visibility for investigating T1078 scenarios, but I would not describe that evidence alone as a reliable Valid Accounts behavioral detection.
+
+### T1548, Abuse Elevation Control Mechanism
+
+**Coverage classification: Telemetry or monitoring coverage**
+
+The Splunk build monitored sudo related activity.
+
+That provides useful visibility into privilege related activity, but broad sudo monitoring does not prove complete detection coverage for the entire T1548 parent technique.
+
+The original green marking is therefore retained as historical evidence of the assessment while the portfolio conclusion uses the narrower classification.
+
+### T1053.003, Scheduled Task or Job, Cron
+
+**Coverage classification: Monitoring coverage**
+
+The lab explicitly monitored CRON activity.
+
+That gives visibility into activity relevant to T1053.003.
+
+However, observing CRON activity is not automatically equivalent to detecting malicious persistence.
+
+A stronger implementation would distinguish expected scheduled activity from suspicious creation, modification, or execution.
 
 ## Gap Visualisation
 
-![Gap Map 1](./screenshots/03_coverage_gap_map_1.png)
+![ATT&CK Coverage Gap Map 1](./screenshots/03_coverage_gap_map_1.png)
 
-Five gaps were marked in red, cross referenced against high prevalence adversary techniques.
+The original assessment also marked four areas red:
 
-The distribution is the finding. The gaps are not scattered randomly, they cluster in Execution, Initial Access, Impact, and Exfiltration, which means these are not missing rules. They are missing tactics.
+* T1566, Phishing
+* T1059, Command and Scripting Interpreter
+* T1486, Data Encrypted for Impact
+* T1567, Exfiltration Over Web Service
+
+These represent areas where the assessed lab did not have equivalent detection or monitoring coverage during the original project.
 
 ## Final Coverage Map
 
-![Gap Map 2](./screenshots/03_coverage_gap_map_2.png)
+![ATT&CK Coverage Gap Map 2](./screenshots/03_coverage_gap_map_2.png)
 
-The unified map was finalised showing detections and gaps together, and the layer exported to JSON for version control.
+The final Navigator view combines the original green and red markings.
 
-Exporting the layer is what makes this repeatable. A coverage map is a snapshot, and a snapshot only has meaning next to the one before it. Versioned layers turn a one time assessment into a measurable trend.
+The important lesson is that the colors need context.
 
-## Detection Coverage
+**Green does not automatically mean complete detection.**
 
-| Technique ID | Technique | Tactic | Status |
+**Red does not mean the SOC is incapable of investigating the activity if other telemetry exists.**
+
+The map is a starting point for asking what evidence supports each coverage claim.
+
+## Detection Coverage Assessment
+
+| Technique ID | Technique | Original Navigator Status | Final Evidence Based Classification |
 | --- | --- | --- | --- |
-| T1110 | Brute force | Credential Access | Detected |
-| T1078 | Valid accounts | Initial Access | Detected |
-| T1548 | Abuse elevation control mechanism | Privilege Escalation | Detected |
-| T1053.003 | Scheduled task or job, cron | Persistence | Detected |
-| T1566 | Phishing | Initial Access | Gap |
-| T1059.001 | PowerShell | Execution | Gap |
-| T1059 | Command and scripting interpreter | Execution | Gap |
-| T1486 | Data encrypted for impact | Impact | Gap |
-| T1567 | Exfiltration over web service | Exfiltration | Gap |
+| T1110 | Brute Force | Green | Detection coverage |
+| T1078 | Valid Accounts | Green | Telemetry or monitoring coverage |
+| T1548 | Abuse Elevation Control Mechanism | Green | Telemetry or monitoring coverage |
+| T1053.003 | Scheduled Task or Job, Cron | Green | Monitoring coverage |
+| T1566 | Phishing | Red | Assessed gap |
+| T1059 | Command and Scripting Interpreter | Red | Assessed gap |
+| T1486 | Data Encrypted for Impact | Red | Assessed gap |
+| T1567 | Exfiltration Over Web Service | Red | Assessed gap |
 
 ## Coverage Metrics
 
+The original Navigator assessment contained:
+
 | Metric | Value |
 | --- | --- |
-| Techniques assessed | 9 |
-| Techniques detected | 4 |
-| Coverage within assessed scope | 44 percent |
-| Gaps identified | 5 |
-| Detection source | Splunk Enterprise, forwarder based build |
-| Layer artefact | layer_detection_coverage.json |
+| Techniques assessed | 8 |
+| Original green markings | 4 |
+| Original red markings | 4 |
+| Original marked coverage ratio | 50 percent |
+| Confirmed stronger detection classification after review | 1 |
+| Additional monitoring or telemetry coverage | 3 |
+| Assessed gaps | 4 |
+
+The original arithmetic was:
+
+**4 green ÷ 8 assessed = 50 percent**
+
+That number describes the original Navigator markings only.
+
+It should **not** be presented as 50 percent detection coverage across ATT&CK or even as proof that all four green techniques have equivalent detection maturity.
+
+The later evidence review showed why a single percentage can hide important differences between telemetry, monitoring, and behavioral detection.
 
 ## What the Gaps Actually Mean
 
-Read the map as an attacker and the problem is obvious.
+The selected scope showed an uneven distribution of visibility.
 
-Coverage sits entirely in authentication and persistence. Getting in is watched. Escalating is watched. Staying is watched.
+Authentication and scheduled activity had useful telemetry.
 
-Nothing watches execution, and nothing watches data leaving.
+Execution and exfiltration had much weaker coverage within the assessed scope.
 
-That shape means an attacker who arrives with valid credentials, which is the most common way anyone arrives, can run whatever they like through PowerShell and walk data out over a web service without generating a single alert. The lab would record them logging in and then go quiet for the entire rest of the intrusion.
+That means activity could move beyond the parts of the environment being monitored without equivalent detection logic following it.
 
-Coverage concentrated at the front of the kill chain feels like security and is not. The gaps are at the end, which is where the damage happens.
+The important finding was therefore not simply that four cells were red.
+
+It was that the lab needed better visibility into what happens after access, particularly execution and outbound activity.
 
 ## Remediation Roadmap
 
 | Priority | Gap | Technique | Detection to Build |
 | --- | --- | --- | --- |
-| 1 | PowerShell execution | T1059.001 | Script Block Logging into Splunk, Event ID 4104 |
-| 2 | Script interpreters | T1059 | Process creation logging with SPL rules |
-| 3 | Web based exfiltration | T1567 | Outbound traffic anomaly detection |
-| 4 | Ransomware behaviour | T1486 | File integrity monitoring alerts |
-| 5 | Phishing | T1566 | Email gateway alerting and attachment scanning |
+| 1 | Command and scripting activity | T1059 | Add PowerShell Script Block Logging and broader process creation telemetry |
+| 2 | Web based exfiltration | T1567 | Develop outbound traffic monitoring and anomaly detection |
+| 3 | Ransomware behavior | T1486 | Add appropriate file activity monitoring and detection logic |
+| 4 | Phishing | T1566 | Add email security telemetry and detection capability |
 
-Execution is first because it is the widest gap and the cheapest to close. Script Block Logging is a policy change, not a purchase, and it turns the darkest part of the map green faster than anything else on the list.
+Execution was the first remediation priority because improving process and scripting visibility would provide useful evidence across several investigation paths.
+
+At the time of this assessment, PowerShell Script Block Logging was not part of the coverage being assessed.
+
+A later lab implementation added PowerShell Script Block Logging and Event ID 4104 telemetry.
+
+That progression demonstrates why coverage assessments are useful.
+
+A gap can become a concrete engineering task.
 
 ## Analyst Findings
 
-Four techniques confirmed detected by named, active Splunk rules.
+The assessment produced several findings:
 
-Five gaps identified spanning Execution, Initial Access, Impact, and Exfiltration.
-
-Coverage concentrated in authentication and persistence, absent in execution and exfiltration.
-
-PowerShell monitoring absent despite being among the most used techniques in real intrusions.
-
-No capability against ransomware behaviour or web based data exfiltration.
+* Eight ATT&CK techniques were included in the deliberately narrow scope
+* Four techniques were originally marked green in Navigator
+* Four techniques were originally marked as gaps
+* Evidence review showed that the green techniques did not all represent the same level of detection maturity
+* T1110 had the strongest direct detection alignment
+* T1078 and T1548 had useful telemetry but required stronger behavioral logic before being described as full technique detection
+* T1053.003 had explicit CRON monitoring but required additional context to distinguish malicious persistence from normal scheduled activity
+* Execution and exfiltration remained important visibility gaps in the original assessment
 
 ## Recommended Response
 
-Close the execution gap before building anything else, because execution is the step every intrusion passes through.
+The first improvement would be stronger execution visibility.
 
-Deploy PowerShell Script Block Logging and route Event ID 4104 into Splunk.
+PowerShell Script Block Logging can provide Event ID 4104 telemetry for PowerShell activity.
 
-Add process creation telemetry to cover the wider scripting interpreter case.
+Process creation telemetry can extend visibility to other command and scripting activity.
 
-Build outbound anomaly detection so data leaving is a detectable event.
+Outbound network monitoring can improve visibility into potential data transfer and exfiltration behavior.
 
-Keep the Navigator layer in version control and re assess quarterly to measure whether coverage is moving.
+The ATT&CK Navigator assessment should then be repeated so improvements are measured against the previous state rather than judged from memory.
 
 ## What This Lab Demonstrates
 
-Auditing your own detections against an adversary framework rather than assuming coverage.
+This project demonstrates:
 
-Refusing to mark a technique detected without a named, running rule behind it.
+* ATT&CK based detection coverage assessment
+* Detection gap analysis
+* Evidence based coverage classification
+* Splunk monitoring review
+* ATT&CK Navigator usage
+* Detection maturity reasoning
+* Remediation prioritisation
+* Honest scoping of security metrics
 
-Reading a coverage map as a kill chain and identifying where an intrusion goes dark.
+The central lesson is:
 
-Prioritising remediation by attacker prevalence and cost to implement, not by matrix order.
+**Telemetry is not automatically detection coverage.**
 
-Producing a versioned Navigator artefact that turns coverage into a trackable metric.
+Seeing an event means an analyst has evidence to investigate.
 
-Reporting a coverage percentage with its scope attached instead of inflating it.
+Calling that activity detected requires stronger evidence that the monitoring logic can identify the suspicious behavior being assessed.
+
+## Lessons Learned
+
+The biggest lesson was that a coverage map can create false confidence if every green cell is treated equally.
+
+A Splunk search finding authentication, sudo, or CRON activity proves that relevant telemetry exists.
+
+It does not automatically prove that malicious behavior associated with the entire ATT&CK technique will generate a reliable alert.
+
+I also learned that coverage percentages need their scope attached.
+
+Four green cells out of eight selected techniques produces 50 percent mathematically, but that does not mean the lab detects 50 percent of ATT&CK.
+
+The percentage only describes the markings inside that deliberately narrow assessment.
+
+The final lesson was that parent techniques and subtechniques need careful handling.
+
+Counting both as independent gaps without separately assessing them can distort the result.
+
+## What I Would Improve
+
+I would expand relevant subtechniques in ATT&CK Navigator before marking coverage.
+
+That would allow areas such as command and scripting activity to be assessed at a more precise level rather than relying on a broad parent technique.
+
+I would also define coverage states before beginning the assessment.
+
+For example:
+
+* Confirmed detection coverage
+* Monitoring or telemetry coverage
+* Gap
+* Not assessed
+
+That would prevent a green cell from carrying more meaning than the evidence supports.
+
+I would export and version the Navigator layer during the assessment so future reviews can compare actual artifacts.
+
+Finally, I would rerun the same assessment after implementing remediation work.
+
+That would turn the project from a one time coverage snapshot into a measurable detection engineering cycle.
 
 ## Repository Structure
 
-```
-mitre-attack-detection-coverage-lab/
+```text
+.
 ├── README.md
-├── layer/
-│   └── layer_detection_coverage.json
 └── screenshots/
+    ├── 00_architecture.png
     ├── 01_blank_layer.png
     ├── 02_current_detections_1.png
     ├── 02_current_detections_2.png
@@ -159,5 +322,10 @@ mitre-attack-detection-coverage-lab/
 
 ---
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-WilliamInCyber-blue?style=flat&logo=linkedin)](https://linkedin.com/in/WilliamInCyber)
-[![X](https://img.shields.io/badge/X-WilliamInCyber-black?style=flat&logo=x)](https://x.com/WilliamInCyber)
+## Author
+
+William Gokah
+
+SOC Analyst Portfolio
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-WilliamInCyber-blue?style=flat&logo=linkedin)](https://linkedin.com/in/WilliamInCyber) [![X](https://img.shields.io/badge/X-WilliamInCyber-black?style=flat&logo=x)](https://x.com/WilliamInCyber)
